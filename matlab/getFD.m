@@ -1,4 +1,4 @@
-function [ FDcap, FDinf, FDcor ] = getFD(img)
+function [ n_cap, n_inf, n_corr, r ] = getFD(img)
 % GETFD      Compute fractal dimensions.
 %
 % Input:     img     a gray scale image (2D matrix, 0..255)
@@ -33,7 +33,7 @@ wn = floor(w / lmax) * lmax;
 hn = floor(h / lmax) * lmax;
 
 
-fprintf(1,'Calculating over h=%d and w=%d\n', hn, wn);
+%fprintf(1,'Calculating over h=%d and w=%d\n', hn, wn);
 L = [];
 NL = [];
 InfL = [];
@@ -61,52 +61,50 @@ for boxsize = pow2(1:floor(log2(lmax)))
         i = i+1;    % count squares
       end
     end
-    fprintf('Quadrate: %5d ', i);
-    fprintf('N=%7.1f and -ln(N)=%10.6f for boxsize %3d\n', Nsum, -log(single(Nsum)), boxsize);
+    %fprintf('Quadrate: %5d ', i);
+    %fprintf('N=%7.1f and -ln(N)=%10.6f for boxsize %3d\n', Nsum, -log(single(Nsum)), boxsize);
     L(count) = boxsize;
     NL(count) = Nsum;
     InfL(count) = Inf / hnwn;
     SqrFreqL(count) = SqrFreq / hnwn^2;
 end
 
-results = [];
-results(1,:) = log(L);
-results(2,:) = -log(NL);
-results(2,:) = InfL;
-results(2,:) = log(SqrFreqL);
+r = L;
+n_cap = -log(NL);
+n_inf = InfL;
+n_corr = log(SqrFreqL);
 
-istart = 2;
-iend = size(results,2)-0;
-X = [ ones(iend-istart+1,1) results(1,istart:iend)'];
+% istart = 2;
+% iend = size(results,2)-0;
+% X = [ ones(iend-istart+1,1) results(1,istart:iend)'];
+% 
+% logNL = -log(NL);
+% Y = logNL(istart:iend)';
+% [B,BINT,R,RINT, STATS] = regress(Y,X);
+% FDcap = B(2);
+% 
+% Y = InfL(istart:iend)';
+% [B,BINT,R,RINT, STATS] = regress(Y,X);
+% FDinf = B(2);
+% 
+% logsqr = log(SqrFreqL);
+% Y = logsqr(istart:iend)';
+% [B,BINT,R,RINT, STATS] = regress(Y,X);
+% FDcor = B(2);
 
-results(2,:) = -log(NL);
-Y = results(2,istart:iend)';
-[B,BINT,R,RINT, STATS] = regress(Y,X);
-FDcap = B(2);
-
-results(2,:) = InfL;
-Y = InfL(istart:iend)';
-[B,BINT,R,RINT, STATS] = regress(Y,X);
-FDinf = B(2);
-
-results(2,:) = log(SqrFreqL);
-Y = results(2,istart:iend)';
-[B,BINT,R,RINT, STATS] = regress(Y,X);
-FDcor = B(2);
-
-fprintf('\nCapacity Fractal Dimension    : %0.5g\nInformation Fractal Dimension : %0.5g\nCorrelation Fractal Dimension : %0.5g\n',FDcap,FDinf, FDcor);
+%fprintf('\nCapacity Fractal Dimension    : %0.5g\nInformation Fractal Dimension : %0.5g\nCorrelation Fractal Dimension : %0.5g\n',FDcap,FDinf, FDcor);
 
 return
 
-% Plot linear fit
-figure; hold on;
-%plot(results(1,1:istart-1), results(2,1:istart-1), 'r.')
-plot(results(1,istart:iend), results(2,istart:iend), 'b.')
-%plot(results(1,iend+1:end), results(2,iend+1:end), 'r.')
-Xfit = results(1,istart:iend);
-Yfit = B(1) + B(2) * Xfit;
-plot(Xfit,Yfit,':k');
-
-xlabel('ln(L)');
-ylabel('-ln(N)');
-title(['Prob. Fractal Dim.: ' sprintf('%0.4g (corr: %0.3g)',FD,corr(Y,Yfit'))]);
+% % Plot linear fit
+% figure; hold on;
+% %plot(results(1,1:istart-1), results(2,1:istart-1), 'r.')
+% plot(results(1,istart:iend), results(2,istart:iend), 'b.')
+% %plot(results(1,iend+1:end), results(2,iend+1:end), 'r.')
+% Xfit = results(1,istart:iend);
+% Yfit = B(1) + B(2) * Xfit;
+% plot(Xfit,Yfit,':k');
+% 
+% xlabel('ln(L)');
+% ylabel('-ln(N)');
+% title(['Prob. Fractal Dim.: ' sprintf('%0.4g (corr: %0.3g)',FD,corr(Y,Yfit'))]);
