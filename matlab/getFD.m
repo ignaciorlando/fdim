@@ -89,8 +89,7 @@ for boxsize = pow2(1:floor(log2(lmax)))
         i = i+1;    % count squares
       end
     end
-    %fprintf('Quadrate: %5d ', i);
-    %fprintf('N=%7.1f and -ln(N)=%10.6f for boxsize %3d\n', Nsum, -log(single(Nsum)), boxsize);
+
     L(count) = boxsize;
     NL(count) = Nsum;
     InfL(count) = Inf / hnwn;
@@ -101,23 +100,3 @@ r = L;
 n_cap = -log(NL);
 n_inf = InfL;
 n_corr = log(SqrFreqL);
-
-% istart = 2;
-% iend = length(NL);
-% X = [ ones(iend-istart+1,1) log(L(istart:iend))];
-% 
-% logNL = -log(NL);
-% Y = logNL(istart:iend);
-% [B,BINT,R,RINT, STATS] = regress(Y,X);
-% FDcap = B(2);
-% 
-% Y = InfL(istart:iend);
-% [B,BINT,R,RINT, STATS] = regress(Y,X);
-% FDinf = B(2);
-% 
-% logsqr = log(SqrFreqL);
-% Y = logsqr(istart:iend);
-% [B,BINT,R,RINT, STATS] = regress(Y,X);
-% FDcor = B(2);
-% 
-% fprintf('\nCapacity Fractal Dimension    : %0.5g\nInformation Fractal Dimension : %0.5g\nCorrelation Fractal Dimension : %0.5g\n',FDcap,FDinf, FDcor);
