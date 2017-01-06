@@ -54,9 +54,6 @@ rs = zeros(p,1);
 Nr = zeros(p,1);
 Infr = zeros(p,1);
 SqrFreqr = zeros(p,1);
-% % ALTERNATIVE
-%Inf_alternative = zeros(p, 1);
-%SqrFreqr_alternative = zeros(p, 1);
 
 % initialize a counter to iterate per each of the scales
 current_r_id = 0;
@@ -70,7 +67,7 @@ for r = pow2(1:floor(log2(lmax)))
     
     % initialize accumulators
     Nsum = 0;
-    Inf_ = 0;
+    Inf = 0;
     SqrFreq = 0;
     % precompute r^2
     r2 = r*r;
@@ -79,60 +76,40 @@ for r = pow2(1:floor(log2(lmax)))
     % increment current r id
     current_r_id = current_r_id+1;
     
-    % % ALTERNATIVE
-    %Inf_sub_alternative = 0;
-    %SqrFreqr_sub_alternative = 0;
-    
     % for each of the cells in the grid
     for k = 1 : r : h-r+1
-        for l = 1 : r : w-r+1
-
-            % get current grid
-            ibox = img(k:k+r-1,l:l+r-1);
-            % retrieve max and minimum values
-            maxi = single(max(ibox(:)));
-            mini = single(min(ibox(:)));
-
-            % compute N
-            N = floor((maxi - mini) / r)+1;  %number of boxes (round up)
-
-            % sum for the capacity measure
-            Nsum = Nsum + N; 
-            % sum for the information measure
-            Inf_ = Inf_ + r2 * (log(r2 / N) - loghw );
-            % sum for the correlation measure
-            SqrFreq = SqrFreq + r2 *r2 / N;
-            
-            % % ALTERNATIVE
-            %P = N / (hw);
-            %Inf_sub_alternative = Inf_sub_alternative - P * log(P);
-            %SqrFreqr_sub_alternative = SqrFreqr_sub_alternative + P^2;
-            
-            % increment current box id
-            box_id = box_id+1;    
-            
-        end
+      for l = 1 : r : w-r+1
+          
+        % get current grid
+        ibox = img(k:k+r-1,l:l+r-1);
+        % retrieve max and minimum values
+        maxi = single(max(ibox(:)));
+        mini = single(min(ibox(:)));
+        
+        % compute N
+        N = floor((maxi - mini) / r)+1;  %number of boxes (round up)
+        
+        % sum for the capacity m
+        Nsum = Nsum+ N; 
+        
+        
+        Inf = Inf + r2 * (log(r2 / N) - loghw );
+        
+        
+        SqrFreq = SqrFreq + r2 *r2 / N;
+        
+        
+        box_id = box_id+1;    % count squares
+      end
     end
 
-    
     rs(current_r_id) = r;
     Nr(current_r_id) = Nsum;
-    Infr(current_r_id) = Inf_ / hw;
+    Infr(current_r_id) = Inf / hw;
     SqrFreqr(current_r_id) = SqrFreq / hw^2;
-    
-    % % ALTERNATIVE
-    %Inf_alternative(current_r_id) = - Inf_sub_alternative;
-    %SqrFreqr_alternative(current_r_id) = SqrFreqr_sub_alternative;
-    
-    
 end
 
 r = rs;
-n_cap = Nr;
+n_cap = -log(Nr);
 n_inf = Infr;
-n_corr = SqrFreqr;
-
-% r = rs;
-% n_cap = Nr;
-% n_inf = Inf_alternative;
-% n_corr = SqrFreqr_alternative;
+n_corr = log(SqrFreqr);
